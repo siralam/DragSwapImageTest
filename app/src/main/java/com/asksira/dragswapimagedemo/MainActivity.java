@@ -1,7 +1,10 @@
 package com.asksira.dragswapimagedemo;
 
 import android.Manifest;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.constraint.ConstraintLayout;
@@ -40,7 +43,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (PermissionUtils.isStorageGranted(MainActivity.this)) {
-                    //TODO: Start save file
+                    String filePath = bitmapToFile(convertViewToBitmap(clContainer));
+                    notifyGallery(filePath);
                 } else {
                     PermissionUtils.checkPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE,
                             1234);
@@ -49,6 +53,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private Bitmap convertViewToBitmap (View view){
+        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bitmap);
+        view.layout(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
+        view.draw(c);
+        return bitmap;
     }
 
     private String bitmapToFile(Bitmap bitmap) {
@@ -82,9 +94,17 @@ public class MainActivity extends AppCompatActivity {
             try {
                 fos.close();
             } catch (Exception e) {
-                Log.d("MiniGame", "Tried to close FileOutputStream");
+                Log.d("MainActivity", "Tried but failed to close FileOutputStream");
             }
         }
         return file.getAbsolutePath();
+    }
+
+    private void notifyGallery(String filePath) {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File file = new File(filePath);
+        Uri contentUri = Uri.fromFile(file);
+        mediaScanIntent.setData(contentUri);
+        sendBroadcast(mediaScanIntent);
     }
 }
