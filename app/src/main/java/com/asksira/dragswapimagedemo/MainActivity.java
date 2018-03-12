@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
     View dragOriginView;
     Drawable whiteDrawable;
     Drawable tempDrawableStorage;
-    private final Object lock = new Object();
     boolean isDragging = false;
 
     @Override
