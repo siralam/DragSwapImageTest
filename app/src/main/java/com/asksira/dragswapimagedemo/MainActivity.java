@@ -88,12 +88,13 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 }
                 if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
-                    boolean beyondLeft = event.getX() < 0;
-                    boolean beyondRight = event.getX() > v.getWidth();
-                    boolean beyondTop = event.getY() < 0;
-                    boolean beyondBottom = event.getY() > v.getHeight();
+                    boolean beyondLeft = event.getX() <= 0;
+                    boolean beyondRight = event.getX() >= v.getWidth();
+                    boolean beyondTop = event.getY() <= 0;
+                    boolean beyondBottom = event.getY() >= v.getHeight();
                     if (beyondLeft || beyondRight || beyondTop || beyondBottom) {
                         startDragAndDrop(v);
+                        return true;
                     } else {
                         return true;
                     }
@@ -120,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             view.startDrag(dragData, new View.DragShadowBuilder(view), null, 0);
         }
+        Log.i("dragEvent", "view.startDragAndDrop has been called");
         tempDrawableStorage = view.getBackground();
         view.setBackground(whiteDrawable);
     }
@@ -130,30 +132,32 @@ public class MainActivity extends AppCompatActivity {
             public boolean onDrag(View v, DragEvent event) {
                 switch (event.getAction()) {
                     case ACTION_DRAG_STARTED:
+                        Log.i("dragEvent", "ACTION_DRAG_STARTED received");
                         return event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN);
                     case ACTION_DRAG_ENTERED:
+                        Log.i("dragEvent", "ACTION_DRAG_ENTERED received");
                         v.setAlpha(0.5f);
-                        v.invalidate();
                         return true;
                     case ACTION_DRAG_LOCATION:
+                        Log.i("dragEvent", "ACTION_DRAG_LOCATION received");
                         return true;
                     case ACTION_DRAG_EXITED:
+                        Log.i("dragEvent", "ACTION_DRAG_EXITED received");
                         v.setAlpha(1f);
-                        v.invalidate();
                         return true;
                     case ACTION_DROP:
+                        Log.i("dragEvent", "ACTION_DROP received");
                         v.setAlpha(1f);
                         swapColor(v);
                         return true;
                     case ACTION_DRAG_ENDED:
+                        Log.i("dragEvent", "ACTION_DRAG_ENDED received");
                         if (!event.getResult() && v == dragOriginView) {
                             dragOriginView.setBackground(tempDrawableStorage);
                             tempDrawableStorage = null;
                         }
                         v.setAlpha(1f);
-                        v.invalidate();
                         isDragging = false;
-                        Log.i("dragEvent", "drag ended");
                         return true;
                     default:
                         //Do nothing
